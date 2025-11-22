@@ -1,0 +1,334 @@
+openapi: 3.0.3
+info:
+  title: AI 週次献立プランナー API
+  version: 0.1.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /parse-ingredients:
+    post:
+      summary: フリーテキストの食材を解析・正規化
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+              required: [text]
+      responses:
+        '200':
+          description: 正規化済みの食材一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngredientParseResult'
+
+  /plans:
+    post:
+      summary: 入力と制約から週次プランを作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanRequest'
+      responses:
+        '202':
+          description: プラン生成を開始
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+
+  /plans/{planId}:
+    get:
+      summary: IDでプランを取得
+      parameters:
+        - in: path
+          name: planId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: プラン
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+
+  /plans/{planId}/slots/{slotId}:
+    patch:
+      summary: 特定スロットを再生成
+      parameters:
+        - in: path
+          name: planId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: slotId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                constraints:
+                  $ref: '#/components/schemas/Constraints'
+      responses:
+        '200':
+          description: 更新後のプラン
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+
+  /plans/{planId}/slots/{slotId}/lock:
+    post:
+      summary: スロットをロックする
+      parameters:
+        - in: path
+          name: planId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: slotId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ロック済み
+
+  /plans/{planId}/shopping-list:
+    get:
+      summary: 集計済みの買い物リストを取得
+      parameters:
+        - in: path
+          name: planId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 買い物リスト
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShoppingList'
+
+  /plans/{planId}/export.csv:
+    get:
+      summary: 買い物リストをCSVでエクスポート
+      parameters:
+        - in: path
+          name: planId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: CSVファイル
+          content:
+            text/csv: {}
+
+  /plans/{planId}/export.pdf:
+    get:
+      summary: プランをPDFでエクスポート
+      parameters:
+        - in: path
+          name: planId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: PDFファイル
+          content:
+            application/pdf: {}
+
+  /plans/{planId}/share:
+    post:
+      summary: 共有リンクを作成
+      parameters:
+        - in: path
+          name: planId
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: 共有リンクを作成しました
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareLink'
+
+  /shared/{token}:
+    get:
+      summary: トークンで共有プランを取得
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 共有プラン
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+
+components:
+  schemas:
+    IngredientParseResult:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngredientRef'
+
+    PlanRequest:
+      type: object
+      properties:
+        text:
+          type: string
+        profile:
+          $ref: '#/components/schemas/UserProfile'
+        constraints:
+          $ref: '#/components/schemas/Constraints'
+      required: [text]
+
+    Constraints:
+      type: object
+      properties:
+        budgetPerWeekJPY:
+          type: number
+          minimum: 0
+        maxCookTimeMin:
+          type: number
+          minimum: 0
+        maxCaloriesPerMeal:
+          type: number
+          minimum: 0
+        cuisines:
+          type: object
+          properties:
+            japanese: { type: number, minimum: 0, maximum: 1 }
+            western: { type: number, minimum: 0, maximum: 1 }
+            chinese: { type: number, minimum: 0, maximum: 1 }
+        excludeIngredients:
+          type: array
+          items: { type: string }
+        allergies:
+          type: array
+          items: { type: string }
+
+    UserProfile:
+      type: object
+      properties:
+        peopleCount: { type: integer, minimum: 1 }
+        tz: { type: string }
+        preferences:
+          type: object
+          properties:
+            cuisines:
+              type: object
+              properties:
+                japanese: { type: number }
+                western: { type: number }
+                chinese: { type: number }
+            excludeIngredients:
+              type: array
+              items: { type: string }
+        allergies:
+          type: array
+          items: { type: string }
+
+    Plan:
+      type: object
+      properties:
+        id: { type: string }
+        weekStartDate: { type: string, format: date }
+        timezone: { type: string }
+        slots:
+          type: array
+          items: { $ref: '#/components/schemas/MealSlot' }
+        lockedSlotIds:
+          type: array
+          items: { type: string }
+
+    MealSlot:
+      type: object
+      properties:
+        id: { type: string }
+        date: { type: string, format: date }
+        period: { type: string, enum: [morning, evening] }
+        recipe: { $ref: '#/components/schemas/Recipe' }
+        notes: { type: string }
+        locked: { type: boolean }
+
+    Recipe:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        summary: { type: string }
+        ingredients:
+          type: array
+          items: { $ref: '#/components/schemas/IngredientRef' }
+        steps:
+          type: array
+          items: { type: string }
+        estimatedTimeMin: { type: number }
+        nutrition:
+          type: object
+          properties:
+            calories: { type: number }
+            protein_g: { type: number }
+            fat_g: { type: number }
+            carbs_g: { type: number }
+        source: { type: string, enum: [llm, user] }
+
+    IngredientRef:
+      type: object
+      properties:
+        ingredientId: { type: string }
+        name: { type: string }
+        quantity: { type: number }
+        unit: { type: string, enum: [g, ml, 個, 大さじ, 小さじ, 枚, 本, 杯] }
+
+    ShoppingList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              name: { type: string }
+              totalQuantity: { type: number }
+              unit: { type: string }
+              category: { type: string }
+              source: { type: string, enum: [from-input, additional-purchase] }
+
+    ShareLink:
+      type: object
+      properties:
+        id: { type: string }
+        planId: { type: string }
+        token: { type: string }
+        expiresAt: { type: string, format: date-time }

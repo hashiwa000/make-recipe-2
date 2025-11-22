@@ -1,0 +1,42 @@
+# クイックスタート: AI 週次献立プランナー
+
+このクイックスタートでは、Library-First のコアと API の想定利用方法を示します（実装後の利用像）。
+
+## 前提条件
+
+- Node.js 20+
+- pnpm/npm
+
+## CLI（packages/menu-core）
+
+- 食材テキストのパース:
+  - echo "鶏もも500g, 玉ねぎ2個, 豆腐1丁" | menu-core parse --json
+- 週次プラン生成（JSON）:
+  - menu-core plan --text "鶏もも500g, 玉ねぎ2個, 豆腐1丁" --people 2 --max-time 20 --json
+
+CLI は stdin/引数 → stdout の契約に従います。JSON もしくはフラグで人間可読出力を選択できます。
+
+## API（backend）
+
+- サーバ起動: pnpm dev（Fastify、http://localhost:3000）
+- プラン作成:
+  - POST /plans（body: { text, profile?, constraints? }）
+- スロットの再生成:
+  - PATCH /plans/{planId}/slots/{slotId}
+- スロットの固定（ロック）:
+  - POST /plans/{planId}/slots/{slotId}/lock
+- 買い物リスト取得:
+  - GET /plans/{planId}/shopping-list
+- エクスポート（CSV/PDF）:
+  - GET /plans/{planId}/export.csv
+  - GET /plans/{planId}/export.pdf
+
+## テスト
+
+- コントラクトテストは `/specs/001-ai-weekly-menu/contracts/openapi.yaml` に対して応答を検証します。
+- ユニット/統合テストはコアアルゴリズムと API オーケストレーションをカバーします。
+
+## 補足
+
+- LLM プロバイダは環境変数で設定（OpenAI 互換）。コアはアダプタによりプロバイダ非依存を維持します。
+- ストレージはデフォルトで SQLite。将来的に PostgreSQL への移行を想定しています。
