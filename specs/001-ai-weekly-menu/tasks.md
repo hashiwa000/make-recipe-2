@@ -86,7 +86,7 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 
 - [ ] T033 [P] [US2] 契約テスト: backend/tests/contract/slot_regenerate.spec.ts（PATCH /plans/{planId}/slots/{slotId} → 200）
 - [ ] T034 [P] [US2] 契約テスト: backend/tests/contract/slot_lock.spec.ts（POST /plans/{planId}/slots/{slotId}/lock → 200）
-- [ ] T035 [P] [US2] 結合テスト: backend/tests/integration/constraints_apply.spec.ts（maxTime/アレルゲン/嗜好反映）
+- [ ] T035 [P] [US2] 結合テスト: backend/tests/integration/constraints_apply.spec.ts（maxTime/アレルゲン/嗜好比率/非連続）
 
 ### 実装
 
@@ -95,7 +95,7 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 - [ ] T038 [US2] API: backend/src/routes/slots.ts（PATCH /plans/:planId/slots/:slotId）
 - [ ] T039 [US2] API: backend/src/routes/slot-lock.ts（POST /plans/:planId/slots/:slotId/lock）
 - [ ] T040 [US2] 検証: packages/menu-core/src/validation/allergen-guard.ts（アレルゲン混入ブロック）
-- [ ] T041 [US2] 嗜好比率: packages/menu-core/src/validation/diversity-rules.ts（同一料理≤15%・和洋中比率）
+- [ ] T041 [US2] 嗜好/多様性: packages/menu-core/src/validation/diversity-rules.ts（同一料理≤15%・和洋中比率・非連続〈隣接日で同一カテゴリ禁止〉）
 
 チェックポイント: US2 単体で条件反映と再生成/ロックが検証可能。
 
