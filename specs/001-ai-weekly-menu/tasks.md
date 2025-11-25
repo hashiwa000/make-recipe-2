@@ -26,6 +26,7 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 - [ ] T008 menu-core エントリ: packages/menu-core/src/index.ts と型定義の雛形追加
 - [ ] T009 backend エントリ: backend/src/server.ts（Fastify 起動雛形）を追加
 - [ ] T010 [P] OpenAPI 契約同期: specs/001-ai-weekly-menu/contracts/openapi.yaml を backend に参照コピー（スクリプト）
+- [ ] T069 [P] テストランナー設定: vitest の導入と設定（vitest.config.ts、package.json scripts: test）
 
 ---
 
@@ -151,9 +152,9 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 ### 保存/共有（FR-007）
 
 - [ ] T064 [P] ShareLink リポジトリ: backend/src/services/share-link-repository.ts（作成/解決/期限）
-- [ ] T065 [US1] API: backend/src/routes/share-link-create.ts（POST /plans/:planId/share-link → 201 + ShareLink）
-- [ ] T066 [US1] API: backend/src/routes/share-link-resolve.ts（GET /share/:token → 200 + Plan〈read-only〉）
-- [ ] T067 [P] 契約テスト: backend/tests/contract/share_link.spec.ts（作成/解決/期限切れ）
+- [ ] T065 [US1] API: backend/src/routes/share.ts（POST /plans/:planId/share → 201 + ShareLink）
+- [ ] T066 [US1] API: backend/src/routes/shared.ts（GET /shared/:token → 200 + Plan〈read-only〉）
+- [ ] T067 [P] 契約テスト: backend/tests/contract/share.spec.ts（作成/解決/期限切れ）
 - [ ] T068 [P] アクセス制御: backend/src/middleware/share-readonly.ts（共有リンク経由は更新不可）
 
 ---
@@ -175,6 +176,7 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 - セットアップ: T004, T005, T006, T007, T010 は並行可
 - 基盤: T012, T015, T017, T019, T020 は並行可
 - 基盤: CLI 系 T059–T063 も並行可（T020 依存）
+- 基盤: テストランナー設定 T069 も並行可
 - US1: T021–T023（テスト）は並行可、T024–T027（ライブラリ実装）も並行可
 - US2: T033–T035（テスト）並行可、T036/T041 並行可
 - US3: T042–T045（テスト）並行可、T046 と T048 並行可
@@ -191,8 +193,23 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 
 ## 検証サマリ（形式/独立基準）
 
-- 総タスク数: 68
-- ストーリー別内訳: US1=17（T021–T032, T056–T058, T065–T066）, US2=9（T033–T041）, US3=8（T042–T049）, その他=10（T001–T020の基盤含む CLI/共有横断）
+- 総タスク数: 69
+- ストーリー別内訳: US1=17（T021–T032, T056–T058, T065–T066）, US2=9（T033–T041）, US3=8（T042–T049）, その他=11（T001–T020の基盤含む CLI/共有/テストランナー）
+
+---
+
+## 契約マッピング（contracts/openapi.yaml 対応）
+
+- POST /parse-ingredients → T028（実装）, T021（契約テスト）
+- POST /plans → T029（実装）, T022（契約テスト）
+- GET /plans/{planId} → T029（実装内で GET 対応）
+- PATCH /plans/{planId}/slots/{slotId} → T038（実装）, T033（契約テスト）
+- POST /plans/{planId}/slots/{slotId}/lock → T039（実装）, T034（契約テスト）
+- GET /plans/{planId}/shopping-list → T049（実装）, T042（契約テスト）
+- GET /plans/{planId}/export.csv → T047（実装）, T043（契約テスト）
+- GET /plans/{planId}/export.pdf → T048（実装）, T044（契約テスト）
+- POST /plans/{planId}/share → T065（実装）, T067（契約テスト）
+- GET /shared/{token} → T066（実装）, T067（契約テスト）
 - 並行機会: 各フェーズに [P] 指定済み（詳細は「並行実行の機会」参照）
 - 独立テスト基準: 各 US に明記（契約/結合テストで検証可能）
 - MVP 提案: US1 完了時点でデモ可能

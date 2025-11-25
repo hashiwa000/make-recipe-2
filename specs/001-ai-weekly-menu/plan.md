@@ -24,7 +24,7 @@
 **言語/バージョン**: Node.js 20 + TypeScript 5  
 **主要依存**: Fastify, Zod, Prisma（SQLite）, OpenAI 互換アダプタ, csv-stringify, pdfkit  
 **ストレージ**: SQLite（Prisma）  
-**テスト**: 契約/結合/ユニット（ランナーは要選定: NEEDS CLARIFICATION）  
+**テスト**: 契約/結合/ユニット（ランナー: Vitest）  
 **ターゲットプラットフォーム**: Linux サーバ（ローカル開発/CI）
 **プロジェクト種別**: web + library（モノレポ: packages/menu-core + backend）  
 **性能目標**: 体感最適化（段階的表示・部分生成）。具体 SLO は別途設定（NEEDS CLARIFICATION）  
