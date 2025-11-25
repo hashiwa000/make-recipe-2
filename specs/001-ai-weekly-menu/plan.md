@@ -1,108 +1,99 @@
-# 実装計画: [FEATURE]
+# 実装計画: 生成AIで1週間の夜の献立計画
 
-**ブランチ**: `[###-feature-name]` | **日付**: [DATE] | **仕様**: [link]
-**入力**: `/specs/[###-feature-name]/spec.md` の機能仕様
+**ブランチ**: `001-impl-plan` | **日付**: 2025-11-25 | **仕様**: /specs/001-ai-weekly-menu/spec.md  
+**入力**: `/specs/001-ai-weekly-menu/spec.md` の仕様書
 
-**注記**: このテンプレートは `/speckit.plan` コマンドで自動生成・更新されます。実行手順は `.specify/templates/commands/plan.md` を参照してください。
+**注意**: このテンプレートは `/speckit.plan` コマンドによって生成されます。ローカル自動化は
+`.specify/scripts/bash/setup-plan.sh` を参照してください。
 
-## 要約
+## サマリー
 
-[機能仕様からの抜粋: 主要要件 + リサーチに基づく技術的アプローチ]
-
-範囲更新（重要）:
-- 自動生成の対象は「夜の献立」のみとする。
-- 「朝の献立」は本計画の対象外（非スコープ）。
-- 以降の設計・実装・テストは、7日間×夜スロット（7件）を前提に記述・検証する。
+- スコープ: 夜のみ・7スロット（7日×夜）。朝は非スコープ。
+- FR-017: 朝用リザーブの確保（在庫を使い切らず最小余剰を残し、表示で明示）。
+- FR-018: 料理カテゴリの非連続（隣接日で同一カテゴリ〈和/洋/中〉を禁止）。
+- アーキテクチャ: Library-First（packages/menu-core）+ Backend API（backend）。OpenAI 互換アダプタ採用。
+- 契約/テスト: Contract-first（contracts/openapi.yaml）。US ごとに契約/結合テストを先行。
 
 ## 技術コンテキスト
 
 <!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
+  必要な作業: この節の内容をプロジェクト固有の技術詳細に置き換えてください。
+  以下の構造は反復の指針としての助言であり、必須ではありません。
 -->
 
-**言語/バージョン**: [例: Python 3.11, Swift 5.9, Rust 1.75 など／要確認]  
-**主要依存**: [例: FastAPI, UIKit, LLVM など／要確認]  
-**ストレージ**: [該当する場合: PostgreSQL/CoreData/ファイル 等 or N/A]  
-**テスト**: [例: pytest/XCTest/cargo test 等／要確認]  
-**ターゲット**: [例: Linuxサーバ/iOS 15+/WASM 等／要確認]
-**プロジェクト種別**: [single/web/mobile - ソース構成を決定]  
-**性能目標**: [領域別: 1000 req/s, 10k lines/sec, 60 fps 等／要確認]  
-**制約**: [領域別: p95<200ms, メモリ<100MB, オフライン対応 等／要確認]  
-**規模/スコープ**: [領域別: 1万人, 100万LOC, 50画面 等／要確認]
+**言語/バージョン**: Node.js 20 + TypeScript 5  
+**主要依存**: Fastify, Zod, Prisma（SQLite）, OpenAI 互換アダプタ, csv-stringify, pdfkit  
+**ストレージ**: SQLite（Prisma）  
+**テスト**: 契約/結合/ユニット（ランナーは要選定: NEEDS CLARIFICATION）  
+**ターゲットプラットフォーム**: Linux サーバ（ローカル開発/CI）
+**プロジェクト種別**: web + library（モノレポ: packages/menu-core + backend）  
+**性能目標**: 体感最適化（段階的表示・部分生成）。具体 SLO は別途設定（NEEDS CLARIFICATION）  
+**制約**: コスト/トークン効率重視、アレルゲン混入率=0 を厳守  
+**スケール/スコープ**: 当面は単一ノード/SQLite 運用（将来 PostgreSQL へ拡張）
 
-## 憲法チェック
+## 憲章チェック（Constitution Check）
 
-GATE: フェーズ0リサーチ着手前に合格必須。フェーズ1設計後に再確認。
+フェーズ0開始前に通過。フェーズ1後に再チェック。
 
-[リポジトリの憲法ファイルに基づくゲート要件]
+- Library-First（ライブラリ優先）: packages/menu-core にコア機能を集約（OK）。
+- CLI Interface（CLI インターフェース）: T059–T063 で CLI（parse/plan/shopping-list/export）を公開（計画済/必須）。
+- Test-First（テスト先行・非交渉）: US ごとに契約/結合テストを先行（T021–T023, T033–T035, T042–T045 ほか）（OK）。
+- Integration Testing（結合テスト）: Contract-first + 結合テストで境界を検証（OK）。
+
+ゲート評価: 現状 OK（CLI はフェーズ2前に動作確認が必要）。
 
 ## プロジェクト構成
 
-### ドキュメント（本機能）
+### ドキュメント（この機能）
 
 ```
-specs/[###-feature]/
-├── plan.md              # 本ファイル（/speckit.plan 出力）
-├── research.md          # フェーズ0出力（/speckit.plan）
-├── data-model.md        # フェーズ1出力（/speckit.plan）
-├── quickstart.md        # フェーズ1出力（/speckit.plan）
-├── contracts/           # フェーズ1出力（/speckit.plan）
-└── tasks.md             # フェーズ2出力（/speckit.tasks。/speckit.planでは作成しない）
+specs/001-ai-weekly-menu/
+├── plan.md
+├── research.md
+├── data-model.md
+├── quickstart.md
+├── contracts/
+└── tasks.md
 ```
 
 ### ソースコード（リポジトリルート）
 <!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
+  必要な作業: 下記のプレースホルダ構成を、この機能に合わせた具体的な構成に置換してください。
+  未使用のオプションは削除し、選択した構成を実パス（例: apps/admin, packages/xxx）で展開します。
+  提出する計画からは「Option」ラベルを削除してください。
 -->
 
 ```
-# [未使用なら削除] オプション1: 単一プロジェクト（デフォルト）
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+packages/
+└── menu-core/
+    └── src/
+        ├── parsing/
+        ├── planner/
+        ├── validation/
+        ├── aggregate/
+        ├── llm/
+        └── cli/
 
-tests/
+backend/
+└── src/
+    ├── routes/
+    ├── services/
+    ├── middleware/
+    └── config/
+
+backend/tests/
 ├── contract/
 ├── integration/
 └── unit/
-
-# [未使用なら削除] オプション2: Webアプリ（frontend + backend）
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [未使用なら削除] オプション3: モバイル + API（iOS/Android）
-api/
-└── [上記 backend と同様]
-
-ios/ または android/
-└── [プラットフォーム固有構成: 機能モジュール/画面フロー/プラットフォームテスト]
 ```
 
-**構成決定**: 採用した構成と、上で示した実際のディレクトリを記載
+**構成の決定**: Library-First のモノレポ（packages/menu-core + backend）に確定。
 
-## 複雑性トラッキング
+## 複雑性トラッキング（必要時のみ）
 
-憲法チェックでの違反があり、正当化が必要な場合のみ記入
+※ 憲章チェックの違反があり、正当化が必要な場合のみ記入
 
-| 逸脱 | 必要な理由 | 却下した単純案 |
-|------|------------|----------------|
-| [例: 4つ目のプロジェクト] | [現状の必要性] | [なぜ3つでは不十分か] |
-| [例: Repositoryパターン] | [具体的な課題] | [なぜ直接DBアクセスでは不十分か] |
+| 逸脱内容 | 必要理由 | 却下したより簡単な代替 |
+|----------|----------|--------------------------|
+| [例: 4つ目のプロジェクト] | [現時点の必要性] | [3つでは不十分な理由] |
+| [例: Repository パターン] | [具体的な課題] | [DB 直接アクセスを却下した理由] |
