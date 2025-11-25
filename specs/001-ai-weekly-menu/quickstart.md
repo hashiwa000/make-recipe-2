@@ -14,6 +14,11 @@
 - 週次プラン生成（夜のみ・JSON）:
   - menu-core plan --text "鶏もも500g, 玉ねぎ2個, 豆腐1丁" --people 2 --max-time 20 --json
   - 出力は 7 スロット（7日×夜）を前提とします。
+ - 買い物リストの取得（JSON）:
+   - menu-core shopping-list --plan-id <PLAN_ID> --json
+ - エクスポート（CSV/PDF ファイル出力）:
+   - menu-core export --plan-id <PLAN_ID> --format csv --out ./shopping.csv
+   - menu-core export --plan-id <PLAN_ID> --format pdf --out ./plan.pdf
 
 CLI は stdin/引数 → stdout の契約に従います。JSON もしくはフラグで人間可読出力を選択できます。
 
