@@ -72,6 +72,12 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 - [ ] T031 [US1] バリデーション: packages/menu-core/src/validation/generation-rules.ts（活用率≥80%検査）
 - [ ] T032 [US1] 監査ログ: backend/src/services/audit-logger.ts（入力条件・要約・生成履歴）
 
+#### 朝用リザーブ（FR-017）
+
+- [ ] T056 [P] [US1] リザーブポリシー: packages/menu-core/src/planner/reserve-policy.ts（最小余剰量の計算/適用。在庫を使い切らない）
+- [ ] T057 [US1] 表示/注記: backend/src/transformers/plan-view.ts（料理カード/買い物リストに「朝用リザーブ」ラベル付与）
+- [ ] T058 [P] [US1] 結合テスト: backend/tests/integration/reserve_policy.spec.ts（最小余剰の確保とラベル表示を検証）
+
 チェックポイント: US1 は単体で動作し、契約/結合テストがグリーン。
 
 ---
@@ -166,8 +172,8 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 
 ## 検証サマリ（形式/独立基準）
 
-- 総タスク数: 55
-- ストーリー別内訳: US1=12（T021–T032）, US2=9（T033–T041）, US3=8（T042–T049）
+- 総タスク数: 58
+- ストーリー別内訳: US1=15（T021–T032, T056–T058）, US2=9（T033–T041）, US3=8（T042–T049）
 - 並行機会: 各フェーズに [P] 指定済み（詳細は「並行実行の機会」参照）
 - 独立テスト基準: 各 US に明記（契約/結合テストで検証可能）
 - MVP 提案: US1 完了時点でデモ可能
