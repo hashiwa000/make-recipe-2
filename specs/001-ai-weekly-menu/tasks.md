@@ -44,6 +44,14 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 - [ ] T019 [P] 設定管理: backend/src/config/env.ts（dotenv＋スキーマ検証）
 - [ ] T020 [P] メニューコア公開: packages/menu-core/src/index.ts から parser/planner をエクスポート
 
+### CLI 公開（憲法対応）
+
+- [ ] T059 [P] CLI エントリ: packages/menu-core/src/cli/index.ts（stdin/args→stdout、JSON/人間可読切替）
+- [ ] T060 [P] CLI: parse コマンド（食材テキスト→IngredientRef[]）
+- [ ] T061 [P] CLI: plan コマンド（入力→Plan 生成〈7スロット・夜のみ〉）
+- [ ] T062 [P] CLI: shopping-list コマンド（Plan→ShoppingList 集計）
+- [ ] T063 [P] CLI: export コマンド（CSV/PDF をファイル出力）
+
 チェックポイント: 基盤準備完了。以降、各 US を独立に並行開始可能。
 
 ---
@@ -140,6 +148,14 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 - [ ] T054 コード整備: 不要依存/未使用コードの削除と命名統一
 - [ ] T055 [P] 追加ユニットテスト: backend/tests/unit/ と packages/menu-core/tests/unit/
 
+### 保存/共有（FR-007）
+
+- [ ] T064 [P] ShareLink リポジトリ: backend/src/services/share-link-repository.ts（作成/解決/期限）
+- [ ] T065 [US1] API: backend/src/routes/share-link-create.ts（POST /plans/:planId/share-link → 201 + ShareLink）
+- [ ] T066 [US1] API: backend/src/routes/share-link-resolve.ts（GET /share/:token → 200 + Plan〈read-only〉）
+- [ ] T067 [P] 契約テスト: backend/tests/contract/share_link.spec.ts（作成/解決/期限切れ）
+- [ ] T068 [P] アクセス制御: backend/src/middleware/share-readonly.ts（共有リンク経由は更新不可）
+
 ---
 
 ## 依存関係と実行順序
@@ -151,11 +167,14 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
   - T024/T025→T026（パース後にプラン生成）
   - T036→T037→T038（制約適用→再生成→API）
   - T046→T047/T049（集計→CSV/JSON 提供）
+  - T020→T059–T063（コア公開後に CLI 実装）
+  - T030→T064–T066（Plan 永続化後に共有リンク作成/解決）
 
 ### 並行実行の機会（例）
 
 - セットアップ: T004, T005, T006, T007, T010 は並行可
 - 基盤: T012, T015, T017, T019, T020 は並行可
+- 基盤: CLI 系 T059–T063 も並行可（T020 依存）
 - US1: T021–T023（テスト）は並行可、T024–T027（ライブラリ実装）も並行可
 - US2: T033–T035（テスト）並行可、T036/T041 並行可
 - US3: T042–T045（テスト）並行可、T046 と T048 並行可
@@ -172,8 +191,8 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 
 ## 検証サマリ（形式/独立基準）
 
-- 総タスク数: 58
-- ストーリー別内訳: US1=15（T021–T032, T056–T058）, US2=9（T033–T041）, US3=8（T042–T049）
+- 総タスク数: 68
+- ストーリー別内訳: US1=17（T021–T032, T056–T058, T065–T066）, US2=9（T033–T041）, US3=8（T042–T049）, その他=10（T001–T020の基盤含む CLI/共有横断）
 - 並行機会: 各フェーズに [P] 指定済み（詳細は「並行実行の機会」参照）
 - 独立テスト基準: 各 US に明記（契約/結合テストで検証可能）
 - MVP 提案: US1 完了時点でデモ可能
