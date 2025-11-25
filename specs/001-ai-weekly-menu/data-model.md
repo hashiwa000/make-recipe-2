@@ -17,21 +17,21 @@
   - id: string (nanoid)
   - weekStartDate: date (ISO, Monday-based)
   - timezone: string (IANA)
-  - slots: MealSlot[14]
+  - slots: MealSlot[7]
   - lockedSlotIds: string[]
   - createdAt: datetime
   - updatedAt: datetime
   - ownerProfileId: string | null (anonymous allowed)
-  - 検証: 7日×2=14 スロットを包含; lockedSlotIds は slots の部分集合
+  - 検証: 7日=7 スロットを包含（夜のみ）; lockedSlotIds は slots の部分集合
 
 - MealSlot
   - id: string (nanoid)
   - date: date (ISO)
-  - period: enum("morning","evening")
+  - period: enum("evening")（夜固定）
   - recipe: Recipe | null (null allowed during generation)
   - notes: string | null
   - locked: boolean
-  - 検証: date はプラン週内; 一意性（date+period）
+  - 検証: date はプラン週内; 一意性（date）
 
 - Recipe
   - id: string (nanoid)
@@ -70,7 +70,7 @@
 ## リレーション
 
 - UserProfile 1—* Plan (optional owner)
-- Plan 1—14 MealSlot
+- Plan 1—7 MealSlot
 - MealSlot 1—1 Recipe
 - Recipe *—* IngredientRef (embedded)
 - Plan 1—* ShoppingItem (derived, not persisted as truth)
@@ -78,7 +78,7 @@
 
 ## 導出とルール
 
-- 多様性ルール: 同一レシピタイトルは全スロットの15%（14中2件）を超えない; 料理比率は嗜好に近似。
+- 多様性ルール: 同一レシピタイトルは全スロットの15%（7中1件）を超えない; 料理比率は嗜好に近似。
 - アレルゲンルール: UserProfile のアレルゲンは IngredientRef に出現してはならない; 検出時はブロックし再生成。
 - 単位正規化: 基本単位（g, ml）を用い、必要に応じて個/大さじ/小さじ等をマッピング; 近似時は注記を付与。
 - 入力活用率: 入力食材の品目数または重量ベースで ≥80% を使用; 不足はレポートし最小限の追加を提案。

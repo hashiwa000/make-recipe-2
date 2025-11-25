@@ -11,8 +11,9 @@
 
 - 食材テキストのパース:
   - echo "鶏もも500g, 玉ねぎ2個, 豆腐1丁" | menu-core parse --json
-- 週次プラン生成（JSON）:
+- 週次プラン生成（夜のみ・JSON）:
   - menu-core plan --text "鶏もも500g, 玉ねぎ2個, 豆腐1丁" --people 2 --max-time 20 --json
+  - 出力は 7 スロット（7日×夜）を前提とします。
 
 CLI は stdin/引数 → stdout の契約に従います。JSON もしくはフラグで人間可読出力を選択できます。
 
