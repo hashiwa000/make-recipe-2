@@ -34,8 +34,12 @@ CLI は stdin/引数 → stdout の契約に従います。JSON もしくはフ�
 
 ## テスト
 
+- ランナー: Vitest（契約/統合/ユニットを共通ランナーで実行）
+- 実行例:
+  - API/契約・統合テスト: `cd backend && pnpm test`
+  - コアユニットテスト: `cd packages/menu-core && pnpm test`
 - コントラクトテストは `/specs/001-ai-weekly-menu/contracts/openapi.yaml` に対して応答を検証します。
-- ユニット/統合テストはコアアルゴリズムと API オーケストレーションをカバーします。
+- （任意強化）OpenAPI レスポンスのスキーマ検証を自動化するテストを追加できます（例: openapi-response-validator を利用）。
 
 ## 補足
 
