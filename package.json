@@ -1,0 +1,22 @@
+{
+  "name": "make-recipe-2",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "backend"
+  ],
+  "scripts": {
+    "build": "npm run -w @make-recipe/menu-core build && npm run -w ai-weekly-menu-backend build",
+    "lint": "eslint . --ext .ts,.tsx,.js,.cjs,.mjs",
+    "format": "prettier --write .",
+    "test": "npm run -w @make-recipe/menu-core test && npm run -w ai-weekly-menu-backend test",
+    "copy:openapi": "npm run -w ai-weekly-menu-backend copy:openapi"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0"
+  }
+}
+

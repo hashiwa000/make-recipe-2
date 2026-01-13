@@ -16,17 +16,17 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 
 目的: ライブラリ優先のモノレポ構成（packages/menu-core + backend）と開発基盤を初期化。
 
-- [ ] T001 ルート構成作成: packages/menu-core/, backend/, docs/ を作成し README を設置
-- [ ] T002 Node/TS 初期化: packages/menu-core/package.json と tsconfig.json の作成
-- [ ] T003 Node/TS 初期化: backend/package.json と tsconfig.json の作成
-- [ ] T004 [P] ESLint/Prettier 設定: .eslintrc.cjs, .prettierrc をリポジトリ直下に作成
-- [ ] T005 [P] 共通スクリプト整備: ルート package.json に `build`, `lint`, `test` スクリプト追加
-- [ ] T006 [P] 環境変数雛形: backend/.env.example に LLM/DB 設定キー追加
-- [ ] T007 [P] Git 忽略: .gitignore へ node_modules, dist, .env を追加
-- [ ] T008 menu-core エントリ: packages/menu-core/src/index.ts と型定義の雛形追加
-- [ ] T009 backend エントリ: backend/src/server.ts（Fastify 起動雛形）を追加
-- [ ] T010 [P] OpenAPI 契約同期: specs/001-ai-weekly-menu/contracts/openapi.yaml を backend に参照コピー（スクリプト）
-- [ ] T069 [P] テストランナー設定: vitest の導入と設定（vitest.config.ts、package.json scripts: test）
+- [X] T001 ルート構成作成: packages/menu-core/, backend/, docs/ を作成し README を設置
+- [X] T002 Node/TS 初期化: packages/menu-core/package.json と tsconfig.json の作成
+- [X] T003 Node/TS 初期化: backend/package.json と tsconfig.json の作成
+- [X] T004 [P] ESLint/Prettier 設定: .eslintrc.cjs, .prettierrc をリポジトリ直下に作成
+- [X] T005 [P] 共通スクリプト整備: ルート package.json に `build`, `lint`, `test` スクリプト追加
+- [X] T006 [P] 環境変数雛形: backend/.env.example に LLM/DB 設定キー追加
+- [X] T007 [P] Git 忽略: .gitignore へ node_modules, dist, .env を追加
+- [X] T008 menu-core エントリ: packages/menu-core/src/index.ts と型定義の雛形追加
+- [X] T009 backend エントリ: backend/src/server.ts（Fastify 起動雛形）を追加
+- [X] T010 [P] OpenAPI 契約同期: specs/001-ai-weekly-menu/contracts/openapi.yaml を backend に参照コピー（スクリプト）
+- [X] T069 [P] テストランナー設定: vitest の導入と設定（vitest.config.ts、package.json scripts: test）
 
 ---
 
@@ -34,16 +34,22 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 
 目的: すべてのストーリーをブロックする基盤の整備。完了までユーザーストーリー着手禁止。
 
-- [ ] T011 Zod スキーマ: packages/menu-core/src/schema/entities.ts に UserProfile/Plan/MealSlot/Recipe/IngredientRef/ShoppingItem/ShareLink を定義
-- [ ] T012 [P] DTO/Constraints: packages/menu-core/src/schema/constraints.ts に Constraints/PlanRequest/ParseInput DTO を定義
-- [ ] T013 Prisma セットアップ: backend/prisma/schema.prisma に data-model.md のエンティティを定義
+- [X] T011 Zod スキーマ: packages/menu-core/src/schema/entities.ts に UserProfile/Plan/MealSlot/Recipe/IngredientRef/ShoppingItem/ShareLink を定義
+- [X] T012 [P] DTO/Constraints: packages/menu-core/src/schema/constraints.ts に Constraints/PlanRequest/ParseInput DTO を定義
+- [X] T013 Prisma セットアップ: backend/prisma/schema.prisma に data-model.md のエンティティを定義
 - [ ] T014 [P] Prisma マイグレーション: backend/prisma/migrations/ 初期マイグレーション作成（SQLite）
-- [ ] T015 [P] LLM アダプタ: packages/menu-core/src/llm/openai-compatible.ts（プロバイダ差し替え可能）
-- [ ] T016 エラーハンドリング: backend/src/middleware/error-handler.ts（ZodError/業務例外→HTTP 変換）
-- [ ] T017 [P] ロギング: backend/src/middleware/logger.ts（リクエスト/応答・監査ログ基盤）
-- [ ] T018 ルーティング基盤: backend/src/routes/index.ts（Fastify 登録・CORS・JSON）
-- [ ] T019 [P] 設定管理: backend/src/config/env.ts（dotenv＋スキーマ検証）
-- [ ] T020 [P] メニューコア公開: packages/menu-core/src/index.ts から parser/planner をエクスポート
+- [X] T015 [P] LLM アダプタ: packages/menu-core/src/llm/openai-compatible.ts（プロバイダ差し替え可能）
+- [X] T016 エラーハンドリング: backend/src/middleware/error-handler.ts（ZodError/業務例外→HTTP 変換）
+- [X] T017 [P] ロギング: backend/src/middleware/logger.ts（リクエスト/応答・監査ログ基盤）
+- [X] T018 ルーティング基盤: backend/src/routes/index.ts（Fastify 登録・CORS・JSON）
+- [X] T019 [P] 設定管理: backend/src/config/env.ts（dotenv＋スキーマ検証）
+- [X] T020 [P] メニューコア公開: packages/menu-core/src/index.ts から parser/planner をエクスポート
+
+### プロンプト/バージョン管理（FR-008）
+
+- [ ] T071 [P] プロファイル定義: packages/menu-core/src/prompt/profiles/ に用途別プロファイル（JSON/MD）を配置（schema付き）
+- [ ] T072 [P] プロファイルローダ: packages/menu-core/src/prompt/loader.ts（schema検証・存在確認・互換性チェック）
+- [ ] T073 [P] バージョン固定: packages/menu-core/src/planner/plan-generator.ts で使用プロファイルID/semver を pin
 
 ### CLI 公開（憲法対応）
 
@@ -65,18 +71,18 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 
 ### テスト（契約/結合）
 
-- [ ] T021 [P] [US1] 契約テスト: backend/tests/contract/parse_ingredients.spec.ts（POST /parse-ingredients → 200 + IngredientParseResult）
-- [ ] T022 [P] [US1] 契約テスト: backend/tests/contract/plans_create.spec.ts（POST /plans → 202 + Plan）
-- [ ] T023 [P] [US1] 結合テスト: backend/tests/integration/plan_generation.spec.ts（材料80%活用・7スロット検証）
+- [X] T021 [P] [US1] 契約テスト: backend/tests/contract/parse_ingredients.spec.ts（POST /parse-ingredients → 200 + IngredientParseResult）
+- [X] T022 [P] [US1] 契約テスト: backend/tests/contract/plans_create.spec.ts（POST /plans → 202 + Plan）
+- [X] T023 [P] [US1] 結合テスト: backend/tests/integration/plan_generation.spec.ts（材料80%活用・7スロット検証）
 
 ### 実装
 
-- [ ] T024 [P] [US1] パーサ: packages/menu-core/src/parsing/ingredient-normalizer.ts（俗称→正規名/単位正規化）
-- [ ] T025 [P] [US1] 入力→DTO: packages/menu-core/src/parsing/parse-input.ts（text→IngredientRef[] 返却）
-- [ ] T026 [P] [US1] プラン生成: packages/menu-core/src/planner/plan-generator.ts（7スロット〈夜のみ〉生成・多様性/活用率ルール）
-- [ ] T027 [P] [US1] 料理モデル補完: packages/menu-core/src/planner/recipe-filler.ts（手順/栄養の雛形生成）
-- [ ] T028 [US1] API: backend/src/routes/parse-ingredients.ts（POST /parse-ingredients）
-- [ ] T029 [US1] API: backend/src/routes/plans.ts（POST /plans, GET /plans/{id}、ストリーミング可）
+- [X] T024 [P] [US1] パーサ: packages/menu-core/src/parsing/ingredient-normalizer.ts（俗称→正規名/単位正規化）
+- [X] T025 [P] [US1] 入力→DTO: packages/menu-core/src/parsing/parse-input.ts（text→IngredientRef[] 返却）
+- [X] T026 [P] [US1] プラン生成: packages/menu-core/src/planner/plan-generator.ts（7スロット〈夜のみ〉生成・多様性/活用率ルール）
+ - [ ] T027 [P] [US1] 料理モデル補完: packages/menu-core/src/planner/recipe-filler.ts（手順/栄養の雛形生成）
+- [X] T028 [US1] API: backend/src/routes/parse-ingredients.ts（POST /parse-ingredients）
+- [X] T029 [US1] API: backend/src/routes/plans.ts（POST /plans, GET /plans/{id}、ストリーミング可）
 - [ ] T030 [US1] 永続化: backend/src/services/plan-repository.ts（Prisma 経由 CRUD）
 - [ ] T031 [US1] バリデーション: packages/menu-core/src/validation/generation-rules.ts（活用率≥80%検査）
 - [ ] T032 [US1] 監査ログ: backend/src/services/audit-logger.ts（入力条件・要約・生成履歴）
@@ -86,6 +92,11 @@ description: "AI 週次献立プランナーの実装タスクリスト（依存
 - [ ] T056 [P] [US1] リザーブポリシー: packages/menu-core/src/planner/reserve-policy.ts（最小余剰量の計算/適用。在庫を使い切らない）
 - [ ] T057 [US1] 表示/注記: backend/src/transformers/plan-view.ts（料理カード/買い物リストに「朝用リザーブ」ラベル付与）
 - [ ] T058 [P] [US1] 結合テスト: backend/tests/integration/reserve_policy.spec.ts（最小余剰の確保とラベル表示を検証）
+
+#### フォールバック/部分生成（FR-012）
+
+- [ ] T079 [P] [US1] フォールバック実装: packages/menu-core/src/planner/generation-fallback.ts（短縮プロンプト・暫定スロット合成）
+- [ ] T080 [P] [US1] 結合テスト: backend/tests/integration/fallback_partial.spec.ts（固定スロット保持/部分生成/再試行の検証）
 
 チェックポイント: US1 は単体で動作し、契約/結合テストがグリーン。
 

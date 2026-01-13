@@ -1,0 +1,67 @@
+// Prisma schema (SQLite) based on data-model.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model UserProfile {
+  id                String   @id @default(cuid())
+  peopleCount       Int
+  preferences       Json
+  allergies         Json
+  budgetPerWeekJPY  Int
+  maxCookTimeMin    Int
+  maxCaloriesPerMeal Int
+  tz                String
+  plans             Plan[]
+}
+
+model Plan {
+  id             String     @id @default(cuid())
+  weekStartDate  String
+  timezone       String
+  slots          MealSlot[]
+  lockedSlotIds  Json
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  ownerProfileId String?
+  owner          UserProfile? @relation(fields: [ownerProfileId], references: [id])
+  shareLink      ShareLink?
+}
+
+model MealSlot {
+  id      String  @id @default(cuid())
+  date    String
+  period  String  // 'evening'
+  notes   String?
+  locked  Boolean @default(false)
+  plan    Plan    @relation(fields: [planId], references: [id])
+  planId  String
+  recipe  Recipe?
+}
+
+model Recipe {
+  id               String   @id @default(cuid())
+  title            String
+  summary          String
+  ingredients      Json
+  steps            Json
+  estimatedTimeMin Int
+  nutrition        Json?
+  source           String
+  slot             MealSlot?
+}
+
+model ShareLink {
+  id        String   @id @default(cuid())
+  planId    String   @unique
+  token     String   @unique
+  expiresAt DateTime?
+  plan      Plan     @relation(fields: [planId], references: [id])
+}
+
